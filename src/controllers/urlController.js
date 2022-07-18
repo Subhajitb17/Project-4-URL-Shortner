@@ -41,16 +41,16 @@ const createShortUrl = async function (req, res) {
       }
   
       //long url already present in database or not
-      const alreadyExistUrl = await urlModel.findOne({ longUrl: longUrl });
+      const alreadyExistUrl = await urlModel.findOne({longUrl});
       if (alreadyExistUrl) {
-        return res.status(400).send({ status: false, msg: `${longUrl} is already exist` });
+        return res.status(400).send({ status: false, msg: `${longUrl}  already exist.It should be unique` });
       }
   
       //Generate Url code
       const urlCode = shortid.generate();
   
       //generated Url code prent in database or not
-      const alreadyExistUrlCode = await urlModel.findOne({ urlCode: urlCode });
+      const alreadyExistUrlCode = await urlModel.findOne({ urlCode:urlCode });
       if (alreadyExistUrlCode) {
         return res.send(400).send({ status: false, msg: `${urlCode} is already exist` });
       }
@@ -67,7 +67,7 @@ const createShortUrl = async function (req, res) {
       //decreale the response body
       let responsebody = {
         longUrl: longUrl,
-        shortUrl: shortUrl,
+        shortUrl:shortUrl,
         urlCode: urlCode,
       };
   
@@ -79,14 +79,14 @@ const createShortUrl = async function (req, res) {
       return res.status(500).send({ status: false, msg: error.message });
     }
   };
-
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 const getUrlCodes = async function(req,res){
   try{
 const urlCode = req.params.urlCode
 if(!isValidRequestBody(urlCode)){return res.status(400).send({status:false,msg:"Please enter the input"})}
 const checkUrlCode = await urlModel.findOne({urlCode})
 if(!checkUrlCode){return res.status(404).send({status:false,msg:"Url does not exist in db"})}
-if(checkUrlCode){return res.status(200).send({status:true,data:checkUrlCode.longUrl})}
+if(checkUrlCode){return res.status(302).redirect(checkUrlCode.longUrl)}
 
 }
 catch(err){
