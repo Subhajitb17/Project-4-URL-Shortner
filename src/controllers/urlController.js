@@ -86,7 +86,7 @@ const urlCode = req.params.urlCode
 if(!isValidRequestBody(urlCode)){return res.status(400).send({status:false,msg:"Please enter the input"})}
 const checkUrlCode = await urlModel.findOne({urlCode})
 if(!checkUrlCode){return res.status(404).send({status:false,msg:"Url does not exist in db"})}
-if(checkUrlCode){return res.status(302).send(checkUrlCode.longUrl)}
+if(checkUrlCode){return res.status(200).send({status:true,data:checkUrlCode.longUrl})}
 
 }
 catch(err){
