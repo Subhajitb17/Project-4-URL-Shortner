@@ -106,4 +106,4 @@ const getUrlCodes = async function (req, res) {
 
 
 module.exports.createShortUrl = createShortUrl;
-module.exports.getUrlCodes = getUrlCodes;
+module.exports.getUrlCodes = getUrlCodes
