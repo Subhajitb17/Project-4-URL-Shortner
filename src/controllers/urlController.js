@@ -47,7 +47,7 @@ const createShortUrl = async function (req, res) {
       }
   
       //Generate Url code
-      const urlCode = shortid.generate();
+      const urlCode = shortid.generate().toLowerCase();
   
       //generated Url code prent in database or not
       const alreadyExistUrlCode = await urlModel.findOne({ urlCode:urlCode });
@@ -84,6 +84,7 @@ const getUrlCodes = async function(req,res){
   try{
 const urlCode = req.params.urlCode
 if(!isValidRequestBody(urlCode)){return res.status(400).send({status:false,msg:"Please enter the input"})}
+if(!shortid.isValid(urlCode)){return res.status(400).send({status:false,msg:`${urlCode} is invalid`})}
 const checkUrlCode = await urlModel.findOne({urlCode})
 if(!checkUrlCode){return res.status(404).send({status:false,msg:"Url does not exist in db"})}
 if(checkUrlCode){return res.status(302).redirect(checkUrlCode.longUrl)}
@@ -101,4 +102,4 @@ catch(err){
 
 
 module.exports.createShortUrl = createShortUrl;
-module.exports.getUrlCodes = getUrlCodes;
+module.exports.getUrlCodes = getUrlCodes
