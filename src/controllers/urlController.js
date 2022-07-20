@@ -3,7 +3,25 @@ const shortid = require("shortid");
 const validurl = require("valid-url");
 const urlModel = require("../models/urlModel");
 const { get } = require("../routes/route");
+const redis =  require("redis");
+const {promisify} = require("util")
 
+
+const redisClient = redis.createClient(
+    12877,
+    "redis-12877.c264.ap-south-1-1.ec2.cloud.redislabs.com",
+    {no_ready_check:true}
+)
+redisClient.auth("568KEaYdilBtOnx8WWaiN14vIuCSkBDr",function(err){
+    if(err) throw err
+})
+redisClient.on("connect",async function(){
+    console.log("connected to redis")
+})
+
+
+const SET_ASYNC=promisify(redisClient.SET).bind(redisClient)
+const GET_ASYNC=promisify(redisClient.GET).bind(redisClient)
 
 //Validation
 const isValid = function (value) {
@@ -16,6 +34,8 @@ const isValid = function (value) {
 const isValidRequestBody = function (request) {
   return (Object.keys(request).length > 0)
 }
+
+
 
 const createShortUrl = async function (req, res) {
     try {
@@ -39,13 +59,19 @@ const createShortUrl = async function (req, res) {
       if (!validurl.isUri(longUrl)) {
         return res.status(400).send({ status: false, message: "url invalid!" });
       }
+      const cacheUrl = await GET_ASYNC(`${longUrl}`)
+      const shortUrlPresent = await urlModel.findOne({longUrl}).select({shortUrl:1,_id:0})
+      if(cacheUrl) return res.status(200).send({status:true,msg:shortUrlPresent})
   
       //long url already present in database or not
-      const alreadyExistUrl = await urlModel.findOne({longUrl});
+      const alreadyExistUrl = await urlModel.findOne({longUrl}).select({_id:0,__v:0})
+      
       if (alreadyExistUrl) {
+        await SET_ASYNC(`${longUrl}`,JSON.stringify(alreadyExistUrl))
         return res.status(400).send({ status: false, msg: `${longUrl}  already exist.It should be unique` });
       }
   
+
       //Generate Url code
       const urlCode = shortid.generate().toLowerCase();
   
@@ -72,8 +98,10 @@ const createShortUrl = async function (req, res) {
       };
   
       //create url model in database
-      const data = await urlModel.create(responsebody);
-      return res.status(201).send({ status: true, msg: "url successfully created", data: data });
+        await urlModel.create(responsebody);
+        const data = await urlModel.findOne({longUrl}).select({_id:0,createdAt:0,updatedAt:0,__v:0})
+        await SET_ASYNC(`${longUrl}`,JSON.stringify(data))
+     return res.status(201).send({ status: true, msg: "url successfully created", data: data });
     }
     catch (error) {
       return res.status(500).send({ status: false, msg: error.message });
