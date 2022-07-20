@@ -35,11 +35,14 @@ const isValidRequestBody = function (request) {
   return (Object.keys(request).length > 0)
 }
 
+let urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%.\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%\+.~#?&//=]*)/
 
 
 const createShortUrl = async function (req, res) {
     try {
       //declare logUrl from request body
+
+
       const longUrl = req.body.longUrl;
   
       //decleare baseUrl
@@ -55,21 +58,20 @@ const createShortUrl = async function (req, res) {
         return res.status(400).send({ status: false, msg: "Please enter url" });
       }
   
+      if(!urlRegex.test(longUrl)){
+        return res.status(400).send({status: false, msg: `${longUrl}  is not in a valid url.` })
+      }
+  
       //long url is valid url or not checking validation
       if (!validurl.isUri(longUrl)) {
         return res.status(400).send({ status: false, message: "url invalid!" });
       }
       const cacheUrl = await GET_ASYNC(`${longUrl}`)
       const shortUrlPresent = await urlModel.findOne({longUrl}).select({shortUrl:1,_id:0})
+
       if(cacheUrl) return res.status(200).send({status:true,msg:shortUrlPresent})
   
-      //long url already present in database or not
-      const alreadyExistUrl = await urlModel.findOne({longUrl}).select({_id:0,__v:0})
       
-      if (alreadyExistUrl) {
-        await SET_ASYNC(`${longUrl}`,JSON.stringify(alreadyExistUrl))
-        return res.status(400).send({ status: false, msg: `${longUrl}  already exist.It should be unique` });
-      }
   
 
       //Generate Url code
