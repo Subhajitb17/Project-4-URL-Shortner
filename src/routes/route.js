@@ -9,9 +9,9 @@ router.get("/test-me", function (req, res) {
     res.send("My first ever api!")
 })
 
-router.post("/url/shorten",urlControllers.createShortUrl)
+router.post("/url/shorten", urlControllers.createShortUrl)
 
-router.get("/:urlCode",urlControllers.getUrlCodes)
+router.get("/:urlCode", urlControllers.getUrlCodes)
 
 router.all("*", function (req, res) {
     res.status(400).send({ status: false, msg: "URL is not valid" })
