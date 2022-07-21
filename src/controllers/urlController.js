@@ -8,11 +8,11 @@ const {promisify} = require("util")
 
 
 const redisClient = redis.createClient(
-    12877,
-    "redis-12877.c264.ap-south-1-1.ec2.cloud.redislabs.com",
+    16043,
+    "redis-16043.c212.ap-south-1-1.ec2.cloud.redislabs.com",
     {no_ready_check:true}
 )
-redisClient.auth("568KEaYdilBtOnx8WWaiN14vIuCSkBDr",function(err){
+redisClient.auth("0CPcalOmGTXLf80NWHNSH5tUS3p1jUo4",function(err){
     if(err) throw err
 })
 redisClient.on("connect",async function(){
@@ -65,11 +65,11 @@ const createShortUrl = async function (req, res) {
       //long url is valid url or not checking validation
       if (!validurl.isUri(longUrl)) {
         return res.status(400).send({ status: false, message: "url invalid!" });
-      }
+      } 
       const cacheUrl = await GET_ASYNC(`${longUrl}`)
-      const shortUrlPresent = await urlModel.findOne({longUrl}).select({shortUrl:1,_id:0})
+    const shortUrlPresent = await urlModel.findOne({longUrl}).select({shortUrl:1,_id:0})
+    if(cacheUrl) return res.status(200).send({status:true,msg:shortUrlPresent})
 
-      if(cacheUrl) return res.status(200).send({status:true,msg:shortUrlPresent})
   
       
   
@@ -113,8 +113,11 @@ const createShortUrl = async function (req, res) {
 const getUrlCodes = async function(req,res){
   try{
 const urlCode = req.params.urlCode
+
 if(!isValidRequestBody(urlCode)){return res.status(400).send({status:false,msg:"Please enter the input"})}
+
 if(!shortid.isValid(urlCode)){return res.status(400).send({status:false,msg:`${urlCode} is invalid`})}
+
 const checkUrlCode = await urlModel.findOne({urlCode})
 if(!checkUrlCode){return res.status(404).send({status:false,msg:"Url does not exist in db"})}
 if(checkUrlCode){return res.status(302).redirect(checkUrlCode.longUrl)}
