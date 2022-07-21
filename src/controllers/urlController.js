@@ -127,7 +127,6 @@ const getUrlCodes = async function (req, res) {
   try {
     const urlCode = req.params.urlCode;
 
-    
     //url code valid or not
     if (!shortid.isValid(urlCode)) {
       return res
@@ -136,16 +135,17 @@ const getUrlCodes = async function (req, res) {
     }
 
     const getShortUrl = await GET_ASYNC(`${urlCode}`);
-
-    const getUrl = await urlModel.findOne({ urlCode });
-    if (!getUrl) {
-      return res.status(404).send({ status: false, msg: "Url not found" });
+    if (getShortUrl) {
+      return res.status(302).redirect(JSON.parse(getShortUrl).longUrl);
     } else {
-      await SET_ASYNC(`${urlCode}`, JSON.stringify(getUrl));
-      return res.status(302).redirect(getUrl.longUrl);
+      const getUrl = await urlModel.findOne({ urlCode });
+      if (!getUrl) {
+        return res.status(404).send({ status: false, msg: "Url not found" });
+      } else {
+        await SET_ASYNC(`${urlCode}`, JSON.stringify(getUrl));
+        return res.status(302).redirect(getUrl.longUrl);
+      }
     }
-
-
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
   }

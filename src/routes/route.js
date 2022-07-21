@@ -14,7 +14,7 @@ router.post("/url/shorten",urlControllers.createShortUrl)
 router.get("/:urlCode",urlControllers.getUrlCodes)
 
 router.all("*", function (req, res) {
-    res.status(404).send({ status: false, msg: "BAD URL NOT FOUND" })
+    res.status(400).send({ status: false, msg: "URL is not valid" })
 })
 
 module.exports = router;
