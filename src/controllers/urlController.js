@@ -7,11 +7,11 @@ const { promisify } = require("util");
 
 //create connection to redis
 const redisClient = redis.createClient(
-  16043, //redis port
-  "redis-16043.c212.ap-south-1-1.ec2.cloud.redislabs.com", //redis db url
+  12634, //redis port
+  "redis-12634.c264.ap-south-1-1.ec2.cloud.redislabs.com", //redis db url
   { no_ready_check: true }
 );
-redisClient.auth("0CPcalOmGTXLf80NWHNSH5tUS3p1jUo4", function (err) {  //redis db password
+redisClient.auth("KdZxJyAsy5sHnlHl7eSGXsTS7d5GWwsP", function (err) {  //redis db password
   if (err) throw err;
 });
 redisClient.on("connect", async function () { //build connection with redis db
