@@ -20,10 +20,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Harshjain3007/Project-URLshortnerGroup67.git"
+    "url": "git+https://github.com/Subhajitb17/Project-4-URL-Shortner.git"
   },
   "bugs": {
-    "url": "https://github.com/Harshjain3007/Project-URLshortnerGroup67/issues"
+    "url": "https://github.com/Subhajitb17/Project-4-URL-Shortner/issues"
   },
-  "homepage": "https://github.com/Harshjain3007/Project-URLshortnerGroup67#readme"
+  "homepage": "https://github.com/Subhajitb17/Project-4-URL-Shortner#readme",
+  "devDependencies": {}
 }
